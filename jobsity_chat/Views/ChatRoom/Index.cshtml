@@ -1,0 +1,63 @@
+﻿@model  Room
+@{
+    ViewData["Title"] = "ChatRoom" + Model.Name;
+}
+
+ 
+<div class="container col-12 overflow-auto" style="height: 400px">
+    <ul class="list-group list-group-flush" id="messagesList"></ul>
+</div>
+    
+<div class="container col-12 fixed-bottom pb-3">
+
+    <div class="form-group">
+        <label for="mensagem">Mensagem</label>
+        <textarea class="form-control" id="mensagem" rows="2"></textarea>
+    </div>
+    <input type="button" class="btn btn-primary" id="send" value="Enviar Mensagem" />
+</div>
+
+
+
+@section Scripts
+    {
+
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/aspnet-signalr/1.1.4/signalr.min.js'></script>
+
+    <script language="javascript">var user = prompt("UserName");
+
+       var roomName = '@Model.Name';
+
+        var connection = new signalR.HubConnectionBuilder().withUrl("/chat").build();
+        $("#send").disabled = true;
+
+        connection.on("ReceiveMessage", function (user, message) {
+            var msg = message.replace(/&/g, "&").replace(/</g, "<").replace(/>/g, ">");
+            var li = $("<li></li>").text(user + ": " + msg);
+            li.addClass("list-group-item");
+            $("#messagesList").append(li);
+        });
+
+        connection.start().then(function () {
+            $("#send").disabled = false;
+
+            connection.invoke("JoinRoom", roomName).catch(function (err) {
+                return console.error(err.toString());
+            });
+
+
+        }).catch(function (err) {
+            return console.error(err.toString());
+        });
+
+        $("#send").on("click", function (event) {
+            
+            var message = $("#mensagem").val();
+            connection.invoke("SendMessage", roomName, user, message).catch(function (err) {
+                return console.error(err.toString());
+            });
+            event.preventDefault();
+        });</script>
+
+}
+
