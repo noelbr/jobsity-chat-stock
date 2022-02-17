@@ -11,10 +11,10 @@
 <div class="container col-12 fixed-bottom pb-3">
 
     <div class="form-group">
-        <label for="mensagem">Mensagem</label>
-        <textarea class="form-control" id="mensagem" rows="2"></textarea>
+        <label for="mensagem">Message</label>
+        <textarea class="form-control" id="message" rows="2"></textarea>
     </div>
-    <input type="button" class="btn btn-primary" id="send" value="Enviar Mensagem" />
+    <input type="button" class="btn btn-primary" id="send" value="Send" />
 </div>
 
 
@@ -24,7 +24,7 @@
 
     <script src='https://cdnjs.cloudflare.com/ajax/libs/aspnet-signalr/1.1.4/signalr.min.js'></script>
 
-    <script language="javascript">var user = prompt("UserName");
+    <script language="javascript"> 
 
        var roomName = '@Model.Name';
 
@@ -52,11 +52,17 @@
 
         $("#send").on("click", function (event) {
             
-            var message = $("#mensagem").val();
-            connection.invoke("SendMessage", roomName, user, message).catch(function (err) {
-                return console.error(err.toString());
-            });
+            var message = $("#message").val();
+            if (message) {
+                connection.invoke("SendMessage", roomName, message).catch(function (err) {
+                    return console.error(err.toString());
+                });
+
+                $("#message").val("");
+            }
             event.preventDefault();
+
+
         });</script>
 
 }

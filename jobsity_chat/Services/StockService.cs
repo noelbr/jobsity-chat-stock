@@ -6,17 +6,22 @@ namespace jobsity_chat.Services
 {
     public class StockService
     {
-        public void GetQuote(string stock) {
+        private readonly ConnectionFactory _connectionFactory;
 
-            var connectionFactory = new ConnectionFactory
+        public StockService(AppSettings appSettings)
+        {
+
+            _connectionFactory = new ConnectionFactory
             {
-                HostName = "rabbitmq3",
-                UserName = "myuser",
-                Password = "mypassword",
-                //Port = 5672
+                HostName = appSettings.RabbitMqHostName,
+                UserName = appSettings.RabbitMqUser,
+                Password = appSettings.RabbitMqPassword
             };
-
-            using (var connection = connectionFactory.CreateConnection())
+        }
+         
+        public void GetQuote(string stock) {
+             
+            using (var connection = _connectionFactory.CreateConnection())
             {
                 using (var channel = connection.CreateModel())
                 {
@@ -28,9 +33,7 @@ namespace jobsity_chat.Services
                     var bytesMessage = Encoding.UTF8.GetBytes(strigfiedMessage);
 
                     channel.BasicPublish(exchange: "", routingKey: "stock", basicProperties: null, body: bytesMessage);
-                }
-
-
+                } 
             }
 
         }

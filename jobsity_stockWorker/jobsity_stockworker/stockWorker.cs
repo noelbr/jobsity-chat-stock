@@ -5,27 +5,66 @@ using System.Threading.Tasks;
 using jobsity_stockWorker.Services.Chat;
 using jobsity_stockWorker.Services.Chat.Requests;
 using jobsity_stockWorker.Services.Stock;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
 namespace jobsity_stockWorker
 {
-    public class stockWorker :  BackgroundService
+    public class StockWorker :  BackgroundService
     {
-   
 
+        public IServiceScopeFactory _serviceScopeFactory;
+        public ConnectionFactory _connectionFactory;
+        public AppSettings _appSettings;
+
+
+        public StockWorker(IServiceScopeFactory serviceScopeFactory)
+        {
+            _serviceScopeFactory = serviceScopeFactory;
+
+
+        }
+
+        private void CreateConnectionFactory()
+        {
+            while (true)
+             {
+                 try
+                 {
+                    using (var scope = _serviceScopeFactory.CreateScope())
+                    {
+                         _appSettings = scope.ServiceProvider.GetRequiredService<AppSettings>();
+                        _connectionFactory = new ConnectionFactory
+                        {
+                            HostName = _appSettings.RabbitMqHostName,
+                            UserName = _appSettings.RabbitMqUser,
+                            Password = _appSettings.RabbitMqPassword,
+                            Port = 5672
+                        };
+                        using var connection = _connectionFactory.CreateConnection();
+                        Console.WriteLine("RabbitMQ avaliable");
+                        break;
+
+                    } 
+                     
+                 }
+                 catch (Exception ex)
+                 {
+                     Console.WriteLine("RabbitMQ offline");
+                     Console.WriteLine(ex.Message);
+                     Task.Delay(15000).Wait();
+                 }
+
+             }
+
+        }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-             
-            var factory = new ConnectionFactory()
-            {
-                HostName = "rabbitmq3",
-                UserName = "myuser",
-                Password = "mypassword",
-                //Port = 5672
-            };
-            using var connection = factory.CreateConnection();
+
+            CreateConnectionFactory();
+            using var connection = _connectionFactory.CreateConnection();
             using var channel = connection.CreateModel();
 
             channel.QueueDeclare(queue: "stock",
@@ -59,12 +98,12 @@ namespace jobsity_stockWorker
 
             Console.WriteLine("Revice resuest stock =>" + stock );
 
-            StockClient stockClient = new StockClient();
-            ChatClient chatClient = new ChatClient();
+            StockClient stockClient = new StockClient(_appSettings);
+            ChatClient chatClient = new ChatClient(_appSettings);
 
-            var simbolsResult = stockClient.Get(stock).Result;
+            var stocksResults = stockClient.Get(stock).Result;
             bool existStock = false;
-            foreach (var item in simbolsResult.Symbols)
+            foreach (var item in stocksResults)
             {
                 Console.WriteLine("stock =>" + item.Symbol );
                 Console.WriteLine("Quote =>" + item.Close );

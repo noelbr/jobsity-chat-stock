@@ -1,9 +1,11 @@
 ﻿using System;
 using jobsity_chat.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 namespace jobsity_chat.Context
 {
-    public class DBChatContext : DbContext
+    public class DBChatContext : IdentityDbContext<IdentityUser, IdentityRole, string>
     {
         public DBChatContext(DbContextOptions<DBChatContext> options)
      : base(options) { }
@@ -13,7 +15,7 @@ namespace jobsity_chat.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

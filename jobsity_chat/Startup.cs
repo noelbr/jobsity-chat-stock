@@ -14,6 +14,7 @@ using Swashbuckle.AspNetCore.Swagger;
 using Microsoft.AspNetCore.Mvc;
 using jobsity_chat.Context;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace jobsity_chat
 {
@@ -36,6 +37,9 @@ namespace jobsity_chat
                 options.UseInMemoryDatabase("InMemoryJobsityChatDB");
             });
 
+            services.AddIdentity<IdentityUser, IdentityRole>()
+                     .AddEntityFrameworkStores<DBChatContext>();
+
 
             services.AddSwaggerGen(c =>
             {
@@ -46,6 +50,10 @@ namespace jobsity_chat
                     Description = "Api to reciver the stock requests",
                 }); 
             });
+
+            AppSettings appSettings = Configuration.Get<AppSettings>();
+            services.AddSingleton(instance => appSettings);
+
 
             services.AddSignalR();
 
@@ -71,9 +79,11 @@ namespace jobsity_chat
             //app.UseHttpsRedirection();
             app.UseStaticFiles();
 
+            
             app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
 
-            //app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

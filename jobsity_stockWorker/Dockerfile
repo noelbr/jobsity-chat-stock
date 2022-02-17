@@ -6,7 +6,7 @@ WORKDIR /app
 COPY ./jobsity_stockWorker ./
 RUN dotnet restore
 
-# Copy everything else and build 
+# Copy everything else and build s
 RUN dotnet publish -c Release -o out
 
 # Build runtime image
