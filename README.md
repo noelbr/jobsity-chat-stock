@@ -4,7 +4,7 @@ Jobsity challenge
 
 ## Description 
 
-Using docker to set the envoviment setup, SignalR to real-time communication chat,  rabbitQM to handlle the queue messages and swaggler to document the api endpoints
+Using docker to set the environment setup, SignalR to real-time communication chat,  rabbitQM to handlle the queue messages and swaggler to document the api endpoints
 
 * jobsity_chat : web application chat write in C# with MVC
 * jobsite_stockWorker : console application to watch the RabbitQM queues and get the stock quote then send do the chat 
@@ -16,7 +16,7 @@ Using docker to set the envoviment setup, SignalR to real-time communication cha
 ## How to executing the project 
 
 
-build the envoriment 
+build the environment 
 
 ```
 docker-compose build
