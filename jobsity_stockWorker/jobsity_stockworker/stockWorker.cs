@@ -40,8 +40,7 @@ namespace jobsity_stockWorker
                         {
                             HostName = _appSettings.RabbitMqHostName,
                             UserName = _appSettings.RabbitMqUser,
-                            Password = _appSettings.RabbitMqPassword,
-                            Port = 5672
+                            Password = _appSettings.RabbitMqPassword 
                         };
                         using var connection = _connectionFactory.CreateConnection();
                         Console.WriteLine("RabbitMQ avaliable");
